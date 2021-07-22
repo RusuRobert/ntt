@@ -1,165 +1,212 @@
 import React from 'react';
 import './App.css';
+import Modal from 'react-modal';
+import ReactModal from 'react-modal';
+Modal.setAppElement('#root');
 
 
-
-
-class Car extends React.Component {
-  render() {
-    return <h2>Hi, I am a Car!</h2>;
+const customStyles = {
+  content: {
+    top: "50%",
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
   }
 }
-
-
 
 class App extends React.Component {
   constructor(props){
-  super(props);
-  this.state = {
-    info: [],
-    infoCrypto: [],
-    isLoaded: false,
-    infoLoaded: false,
+    super(props);
+    this.state = {
+      info: [],
+      isLoaded: false,
+      idCrypto: [],
+      modalIsOn: false,
+      
+    }
+    
+    this.handleCloseModal = this.handleCloseModal.bind(this); 
   }
-}
 
-componentDidMount(){
-  fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&order=market_cap_desc&per_page=10&page=1&sparkline=false')
+
+
+
+  
+ 
+    handleClick = (id) => {
+    console.log(`you clicked on ${id}`)
+    fetch(`https://api.coingecko.com/api/v3/coins//${id}?localization=true&per_page=10`)
+    .then(res=>res.json())
+    .then(json =>{
+      this.setState({
+        idCrypto: json,
+        modalIsOn : true,
+      })
+    });
+    }
+    
+  
+    handleCloseModal() {
+      this.setState({
+        modalIsOn: false,
+      })
+      
+    };
+
+  
+
+  
+
+  componentDidMount(){
+    fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&order=market_cap_desc&per_page=10&page=1&sparkline=false')
     .then(res => res.json())
     .then(json => {
-        this.setState({
-          isLoaded: true,
-          info: json,
-        })
+      this.setState({
+        isLoaded: true,
+        info: json,
+      })
     })  
-}
-
-apicallfunction (){
-  fetch('https://api.coingecko.com/api/v3/coins/ethereum?localization=false')
-  .then(res => res.json())
-  .then(json => {
-    this.setState({
-      infoLoaded: true,
-      infoCrypto: json,
-    })
-  
-  })
-}
-  
-  render () {
-    
-    var {info, isLoaded, infoCrypto, infoLoaded,} = this.state;
-    
-    
-    if(!isLoaded){
-      return <div>Nu s-au incarcat fisierele</div>
-    }
-    else{
-      console.log(infoCrypto)
-
-  return (
-    <div className="App">
+  }
+      
+      render () {
+        var {info, idCrypto } = this.state;
+      return (
+        <div className="App">
         
-        <table id="tabelinfo">
+        <table className="table is-bordered is-fullwidth">
           <tr>
-            <th  className="thprincipal">Crypto Name</th>
+            <th  scope="col" className="">Crypto Name</th>
             
-              
-              {info.map(info => (
-                <th>
-                <div className="container">
-                  <button onClick= {this.apicallfunction.bind(this)}
-                          className="button is-small" 
-                          key={info.id}>
-                            {info.name.forEach(e, i => {
-                              e = i+1;
-                            })}
-                            
-                              
-                            
-                            
-                  </button>
+            {info.map(elem => (
+                <th scope="col" className="container">
+                <div className="container has-text-centered">
+                
+                <h1>
+                  {elem.name}
+                </h1>
+                
                   
-                  <div>{info.id}</div>
+                    
+                  
+                  <div className="has-text-centered container">
+                <button
+                className="button is-primary is-light is-small" 
+                onClick = {() => {this.handleClick(elem.id)}}>More Info</button>
+                <div id="modal" className="modal">
+
+                  
+                        <ReactModal
+                        isOpen={this.state.modalIsOn}
+                        contentLabel="Minimal Modal Example"
+                        style={customStyles}>
+                  <div className="modal-content has-text-centered">
+                        
+                          <h1 className="subtitle is-6">Name:{idCrypto.name}</h1><br/>
+                          <h1 className="subtitle is-6">Symbol:{idCrypto.symbol}</h1><br/>
+                          <h1 className="subtitle is-6">Hashing algorithm:{idCrypto.hashing_algorithm}</h1><br/>
+                          <h1 className="subtitle is-6">Description:{idCrypto.description?.en}</h1><br/>
+                          <h1 className="subtitle is-6">Market cap in euro:{idCrypto.market_cap_change_24h_in_currency?.eur}</h1><br/>
+                          <h1 className="subtitle is-6">Homepage:{idCrypto.links?.homepage}</h1><br/>
+                          <h1 className="subtitle is-6">Genesis Date:{idCrypto.genesis_date}</h1><br/>
+                        <br/>
+                        <button className="button is-primary is-light is-small"
+                        onClick = {() => {this.handleCloseModal()}}>Close Info</button>
+                  </div>
+                        </ReactModal>
+                </div>
+
+                  
+        
                 
                 </div>
-              </th>
-                  ))}
+                </div>
+            {/*    
+                    {(this.state.modalIsOn ? <Modal/> : this.hideModal())}
+            */}
+                    
+                    </th>
+                    
+                    ))}
+                    
+                          
               
+            
             
           </tr>
           <tr>
-              <th className="thprincipal">
+              <th className="">
                   Crypto Image
               </th>
 
 
-              {info.map(info =>(
+              {info.map(elem =>(
                   <th>
                     <div className="container">
-                      <img key={info.image} src={info.image}/>
+                      <img key={elem.image} src={elem.image}/>
                     </div> 
                   </th>
                 ))}
           </tr>
 
           <tr>
-              <th className="thprincipal">
+              <th className="">
               
                   Crypto Symbol
                
               </th>
 
 
-              {info.map(info =>(
+              {info.map(elem =>(
                   <th>
                     <div className="container">
-                      {info.symbol}
+                      {elem.symbol}
                     </div> 
                   </th>
                 ))}
           </tr>
 
           <tr>
-              <th className="thprincipal">
+              <th className="">
                   Current Price
               </th>
 
 
-              {info.map(info =>(
+              {info.map(elem =>(
                   <th>
                     <div className="container">
-                      {info.current_price}
+                      {elem.current_price}
                     </div> 
                   </th>
                 ))}
           </tr>
 
           <tr>
-              <th className="thprincipal">
+              <th className="">
                   High 24 Hour Price
               </th>
 
 
-              {info.map(info =>(
+              {info.map(elem =>(
                   <th>
                     <div className="container">
-                      {info.high_24h}
+                      {elem.high_24h}
                     </div> 
                   </th>
                 ))}
           </tr>
 
           <tr>
-              <th className="thprincipal">
+              <th className="">
                   Low 24 Hour Price
               </th>
 
 
-              {info.map(info =>(
+              {info.map(elem =>(
                   <th>
                     <div className="container">
-                      {info.low_24h}
+                      {elem.low_24h}
                     </div> 
                   </th>
                 ))}
@@ -171,7 +218,5 @@ apicallfunction (){
   );
     }
   }
-
-}
 
 export default App;
