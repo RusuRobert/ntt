@@ -1,3 +1,20 @@
+website name: https://nttsiterusu.netlify.app/
+
+// clone project or clone repository 
+
+git clone https://github.com/RusuRobert/ntt.git
+
+// enter project file
+
+cd ntt
+
+// make sure you have npm installed and then run
+
+npm install 
+npm start
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

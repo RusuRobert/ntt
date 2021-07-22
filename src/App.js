@@ -144,7 +144,7 @@ class App extends React.Component {
                           {info.map(elem =>(
                               <th>
                                 <div className="container">
-                                  <img key={elem.image} src={elem.image}/>
+                                  <img alt="" key={elem.image} src={elem.image}/>
                                 </div> 
                               </th>
                             ))}
